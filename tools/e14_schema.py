@@ -46,11 +46,19 @@ PAGE_W  = X_RIGHT - X_LEFT   # ≈ 3380
 CAND_X  = 200
 CAND_W  = 3215   # x=[200,3415]
 
-# Vote-digit geometry (right side of each numeric row)
-DIGIT_X0     = 2500   # left edge of first digit cell
+# Vote-digit geometry (right side of each numeric row).
+# Nominal digit cells from the printed form are 270 wide, 300 stride
+# (30 px gap), and ~55% of the row height.  We pad outward to absorb
+# warp residuals (observed max-err ~50 px) so digits don't get clipped.
+# pad_x=15 makes new width 300 == stride, so adjacent cells touch but
+# don't overlap.  pad_y=80 grows the height comfortably past the worst
+# observed vertical residual.
+DIGIT_X0     = 2500   # left edge of first nominal digit cell
 DIGIT_WIDTH  = 270
 DIGIT_STRIDE = 300    # center-to-center = DIGIT_WIDTH + gap(30)
 DIGIT_HEIGHT_FRAC = 0.55   # fraction of row height
+DIGIT_PAD_X  = 15
+DIGIT_PAD_Y  = 80
 
 
 # ---------------------------------------------------------------------------
@@ -77,12 +85,14 @@ def _header_band(page_id: str, y0: int, y1: int) -> Cell:
 
 
 def _digits(row_id: str, y_center: int, row_height: int) -> list[Cell]:
-    """Three vote-digit cells for one numeric row."""
-    h = int(row_height * DIGIT_HEIGHT_FRAC)
+    """Three vote-digit cells for one numeric row (padded for warp slack)."""
+    nominal_h = int(row_height * DIGIT_HEIGHT_FRAC)
+    w = DIGIT_WIDTH + 2 * DIGIT_PAD_X
+    h = nominal_h + 2 * DIGIT_PAD_Y
     y = y_center - h // 2
     return [
         Cell(f"{row_id}.digit_{i + 1}", "vote_digit",
-             (DIGIT_X0 + i * DIGIT_STRIDE, y, DIGIT_WIDTH, h))
+             (DIGIT_X0 + i * DIGIT_STRIDE - DIGIT_PAD_X, y, w, h))
         for i in range(3)
     ]
 
