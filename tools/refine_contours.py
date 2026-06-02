@@ -14,7 +14,10 @@ Algorithm (per reference image):
     * left   = strongest vertical   ink line in [x-h, x+h] over [top..bottom]
     * right  = strongest vertical   ink line in [x+W-h, x+W+h] over [top..bottom]
   Pass 2 — for each vote_digit cell:
-    * shift y by the parent row's y-shift (keeps digits inside the row)
+    * translate by the parent row's left-edge dx and vertical-center dy
+      (dx propagation matters for the consulado template, whose table is
+      printed ~33 px left of the schema's nominal DIGIT_X0; without it
+      halo=20 can't recover and digits stick to the projected x)
     * snap each border with halo=20
 
 If a border is not found (coverage below threshold), we keep the projected
