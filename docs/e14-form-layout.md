@@ -79,6 +79,16 @@ wide × ~55% of row height tall, vertically centered in the row.
 
 Every page carries:
 
+0. **Four solid-black registration squares**, one per page corner
+   (~100×100 px at the reference rasterization, full-page extent).
+   These are printed by the Registraduría specifically as fiducial
+   marks. They are the strongest available basis for a 4-point
+   perspective homography: maximally spread, geometrically trivial
+   (so robust to blur and contrast loss), and survive distortion that
+   breaks barcode decoding or bar-darkness detection. Detector lives
+   at `tools/detect_anchors.py:detect_corner_squares` — scoring picks
+   the dark blob **closest to the page corner**, not the largest, so
+   QR finder patterns and page-number ink don't win.
 1. **Code-128 barcode**, top-centre. Decode with `pyzbar`; its corners
    give a tight quadrilateral. **The payload is NOT the mesa code** —
    it's a 44-char base64 string (32 bytes), different on every page of
@@ -106,6 +116,26 @@ Every page carries:
 
 Three anchor points suffice for a 2D affine fit; four+ gives
 overdetermined least-squares.
+
+### What survives in real-world scans?
+
+Empirically, on the dep=88 (consulates) subset:
+
+- **Clean digital PDFs** (the form rendered server-side, never
+  printed) keep every anchor at reference position. All 4 corner
+  squares + barcode + header bar detect cleanly.
+- **Phone photos of the printed form** often crop the top of the form
+  too tightly — the photographer frames against the candidate rows
+  and the **top two corner squares end up outside the frame**. The
+  bottom squares survive because there's whitespace below candidate 7.
+  Fallback: combine the two surviving corner squares with the header
+  bar and/or barcode for a 4-point fit.
+- **`PÁGINA NO DIGITALIZADA` placeholder pages** exist in the corpus.
+  When a page wasn't actually scanned, the Registraduría serves a
+  stub PDF with only the Registraduría coat-of-arms and the literal
+  text "PÁGINA NO DIGITALIZADA". Anchor detection correctly returns
+  zero anchors on these — a useful "this scan is unusable" signal,
+  not a detector bug.
 
 ## What is in the footer?
 
@@ -148,11 +178,11 @@ template space → read cells from hardcoded reference-space
 rectangles. There is no shortcut where the form "tells us" where its
 cells are.
 
-`tools/detect_grid.py` exists from an earlier exploration of pure
-line-detection on a 300-DPI reference; the line mask it produces is
-useful as a debug aid (it makes the dropped-corner failure mode
-visually obvious) but the connected-components cell extraction it
-attempts is a dead end for this form.
+An earlier `tools/detect_grid.py` explored pure line-detection on a
+300-DPI reference; the line mask it produced made the dropped-corner
+failure mode visually obvious, but its connected-components cell
+extraction was a dead end for this form. Tool removed during the
+squash that introduced the anchor/projection pipeline.
 
 ### Bottom-up cell discovery doesn't work either
 
@@ -264,6 +294,10 @@ including `01`, `03`, `07`, `09`, `88`-consulado, … none of which exist
 in DIVIPOLA). One concrete confirmation from the eyeballed sample:
 `dep=05, mun=097` decodes to `BOLIVAR / SIMITÍ` in the acta header,
 whereas DIVIPOLA `05` is Antioquia.
+
+Within `dep=88` (Consulados), the second level is the consulate
+country/city rather than a Colombian municipality — e.g.
+`88/360 = Estados Unidos`.
 
 For aggregation/reporting we'll need to build a Registraduría-code →
 DIVIPOLA-code lookup. The acta headers themselves carry the human
