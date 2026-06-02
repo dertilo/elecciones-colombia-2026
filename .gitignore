@@ -1,0 +1,28 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Local data — large & regenerable from the scraper.
+# Keep the directory layout out of git; index/manifest are rebuilt on demand.
+data_2026/
+
+# Scrape logs
+*.log
+
+# Secrets / local config
+secrets.sh
+.env
+.env.*
+
+# Editor / OS noise
+.DS_Store
+.idea/
+.vscode/
+CLAUDIA.md
