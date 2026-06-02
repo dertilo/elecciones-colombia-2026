@@ -64,10 +64,16 @@ class WarpResult:
     #   perspective: only the first 4 matches define M, so their residual
     #     is mechanically 0; reported RMS/max is the *cross-check* of the
     #     remaining auxiliary anchors (barcode, header_bar) against the
-    #     corner-based homography.  Large values here usually mean the
-    #     reference and the scan disagree on aux-anchor positions
-    #     (template-version drift), NOT that the corner warp itself is
-    #     bad -- inspect the diag overlay to be sure.
+    #     corner-based homography.  Large values here mean the corner
+    #     warp itself is fine but the corner positions disagree with the
+    #     aux positions.  In order of likelihood:
+    #       (a) the reference's anchors JSON has bogus corner positions
+    #           baked in (hand-authored garbage, or a buggy generator);
+    #           hit historically on regular-{2,3}.json + consulado-2.json.
+    #       (b) genuine template-version drift between reference and scan.
+    #     Always inspect the diag overlay to disambiguate; if the warped
+    #     scan visually aligns with the reference, the aux positions are
+    #     the suspect, not the corners.
     #   affine (3 pts) / similarity (2 pts): residual is mechanically 0
     #     because the fit consumes exactly the DoF of the transform; the
     #     metric is uninformative.
