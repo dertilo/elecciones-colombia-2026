@@ -2,7 +2,7 @@
 E-14 form cell schema — declarative layout in reference-image pixel coords.
 
 Reference images live at:
-  data_2026/templates/ref/<template>-<page>.png
+  templates/ref/<template>-<page>.png
 All are 3600 px wide; heights vary (see SIZE_MAP).
 
 All bboxes are (x, y, w, h) in reference-image pixel coordinates.
@@ -325,7 +325,7 @@ _DISPATCH: dict[tuple[str, int], callable] = {
     ("consulado", 3): _consulado_3,
 }
 
-_REF_DIR = Path(__file__).parent.parent / "data_2026" / "templates" / "ref"
+_REF_DIR = Path(__file__).parent.parent / "templates" / "ref"
 
 
 def cells(template: str, page: int) -> list[Cell]:

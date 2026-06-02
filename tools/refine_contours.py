@@ -44,8 +44,8 @@ Limitations / gotchas:
     rows that fall inside known dark bands.
 
 Outputs:
-  data_2026/templates/projected/<stem>_refined_overlay.png
-  data_2026/templates/projected/<stem>_refined.json
+  templates/projected/<stem>_refined_overlay.png
+  templates/projected/<stem>_refined.json
 
 Usage:
   uv run --with opencv-python-headless --with numpy \\
@@ -241,7 +241,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    out_dir = _REPO / "data_2026" / "templates" / "projected"
+    out_dir = _REPO / "templates" / "projected"
     out_dir.mkdir(parents=True, exist_ok=True)
     for stem in args.stems:
         process_stem(stem, out_dir)

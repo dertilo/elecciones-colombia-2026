@@ -3,7 +3,7 @@
 Workflow per scan:
   1. Detect anchors on the scan with ``detect_anchors.detect_anchors``.
   2. Load cached anchors for the chosen reference (``--ref regular-1`` etc.)
-     from ``data_2026/templates/anchors/<ref>.json``.
+     from ``templates/anchors/<ref>.json``.
   3. Match anchors by name.  Available matches drive the transform choice:
 
        4-pt perspective   -- preferred; needs >=4 named pairs.  We weight
@@ -17,9 +17,9 @@ Workflow per scan:
        fail               -- < 2 matches; warp is undefined.
 
   4. Warp the scan to the reference page size, write
-       data_2026/templates/warped/<scan-stem>__to__<ref-stem>.png
+       templates/warped/<scan-stem>__to__<ref-stem>.png
      and a thumb-sized side-by-side diagnostic
-       data_2026/templates/warped/<scan-stem>__to__<ref-stem>_diag.png
+       templates/warped/<scan-stem>__to__<ref-stem>_diag.png
 
 A small JSON sibling records the transform method, the matched anchor
 names, and the per-point reprojection error (max + RMS) so we can audit
@@ -42,9 +42,9 @@ sys.path.insert(0, str(_REPO / "tools"))
 
 from detect_anchors import Anchor, detect_anchors  # noqa: E402
 
-_ANCHOR_DIR = _REPO / "data_2026" / "templates" / "anchors"
-_REF_DIR = _REPO / "data_2026" / "templates" / "ref"
-_OUT_DIR = _REPO / "data_2026" / "templates" / "warped"
+_ANCHOR_DIR = _REPO / "templates" / "anchors"
+_REF_DIR = _REPO / "templates" / "ref"
+_OUT_DIR = _REPO / "templates" / "warped"
 
 # Corner-square anchors first -- they are the most reliable and the most
 # spread out, so any 4-pt fit should prefer them.  ``barcode`` and

@@ -1,7 +1,7 @@
 """
 Project the E-14 cell schema onto reference PNGs and produce:
-  - data_2026/templates/projected/<stem>_overlay.png  (full-res colour overlay)
-  - data_2026/templates/projected/<stem>.json          (cell list as JSON)
+  - templates/projected/<stem>_overlay.png  (full-res colour overlay)
+  - templates/projected/<stem>.json          (cell list as JSON)
 
 Usage:
   uv run --with opencv-python-headless --with numpy \\
@@ -151,7 +151,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    out_dir = _REPO / "data_2026" / "templates" / "projected"
+    out_dir = _REPO / "templates" / "projected"
     out_dir.mkdir(parents=True, exist_ok=True)
 
     for stem in args.stems:

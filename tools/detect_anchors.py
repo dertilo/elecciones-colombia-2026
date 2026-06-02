@@ -14,8 +14,8 @@ Fallback / cross-check anchors (still emitted when found):
   * HEADER_BAR -- the dark CANDIDATO|AGRUPACION|VOTACION horizontal band.
 
 Output:
-  data_2026/templates/anchors/<stem>.json
-  data_2026/templates/anchors/<stem>_overlay.png
+  templates/anchors/<stem>.json
+  templates/anchors/<stem>_overlay.png
 """
 
 from __future__ import annotations
@@ -268,7 +268,7 @@ def main() -> None:
     if len(sys.argv) < 2:
         print(f"usage: {sys.argv[0]} <reference.png> [...]", file=sys.stderr)
         sys.exit(2)
-    out_dir = Path("data_2026/templates/anchors")
+    out_dir = Path("templates/anchors")
     out_dir.mkdir(parents=True, exist_ok=True)
     for arg in sys.argv[1:]:
         path = Path(arg)

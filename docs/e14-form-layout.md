@@ -52,7 +52,7 @@ footer (see "What is in the footer?" below). The middle differs:
   + cedula number).
 
 The 7+6 candidate split and the 6 signature blocks are verified by
-inspection of `data_2026/templates/ref/regular-{1,2,3}.png` at 300 DPI;
+inspection of `templates/ref/regular-{1,2,3}.png` at 300 DPI;
 consulado references appear identical in structure.
 
 ### Numeric fields look like 3 discrete digit positions

@@ -1,0 +1,7 @@
+# derived artefacts — regenerable from ref/ + tooling
+anchors/*_overlay.png
+anchors/thumb/
+detected/
+extracted/
+projected/
+warped/
