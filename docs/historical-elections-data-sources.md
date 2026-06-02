@@ -7,15 +7,109 @@ elections (2018, 2022, …) when the goal is **per-mesa vote counts**
 
 ## Where do per-mesa 2022 presidential vote counts live?
 
-**Short answer: nowhere publicly reachable.** Every Registraduría
-hosting endpoint that ever served 2022 data is dead, no aggregator
-republished the data, and the Internet Archive only captured the
-static front-end shell — not the XHR JSON responses that carried the
-numbers. Realistic remaining options are a formal *derecho de petición*
-to the Registraduría (slow but legally obligated) or dropping 2022.
+**Short answer: MOE (Misión de Observación Electoral) republished them.**
+The Registraduría supplied MOE with the underlying mesa-level escrutinio
+databases as part of its electoral-observation cooperation, and MOE
+posted them as downloadable spreadsheets on `moe.org.co`. First-round
+files are still live as direct `wp-content/uploads/` xlsx; second-round
+files were Google Sheets that have since been deleted (HTTP 410). See
+"Recovering the 2nd-round files" below for fallback paths.
 
-What follows is the dead-end inventory, kept so the next investigator
-does not re-run the search.
+This is the path. Every direct Registraduría endpoint is dead, but the
+data itself is preserved.
+
+### What MOE published
+
+| Round | Type | Source URL | Size | Status |
+|---|---|---|---|---|
+| 1ra vuelta | Preconteo "primer avance" (cut-off 2022-06-01) | `https://www.moe.org.co/wp-content/uploads/2022/06/Escrutinios-primera-vuelta-presidencial-mesa-a-mesa-1.xlsx` | 8.4 MB | live |
+| 1ra vuelta | CNE definitive escrutinio | `https://www.moe.org.co/wp-content/uploads/2022/06/Escrutinio-definitivo-1ra-vuelta-presidencial-2022.xlsx` | 8.6 MB | live |
+| 2da vuelta | Preconteo at 99.99% mesas | `https://docs.google.com/spreadsheets/d/1LUladRfeuL8euCerXeYfR717hXi7-K6f/` | — | **410 Gone** |
+| 2da vuelta | CNE definitive escrutinio | `https://docs.google.com/spreadsheets/d/1nG4yMvA4MSDIarZHYlokj_ZgioJ97SCg/` | — | **410 Gone** |
+
+Posts that link these:
+- `moe.org.co/datos-del-escrutinio-elecciones-presidenciales-2022-primera-vuelta-primer-avance-datos-con-corte-al-1-de-junio-de-2022/`
+- `moe.org.co/datos-definitivos-del-escrutinio-elecciones-presidenciales-2022-primera-vuelta-resultados-definitivos-posteriores-al-escrutinio-general-a-cargo-del-consejo-nacional-electoral/`
+- `moe.org.co/como-voto-la-ciudadania-colombiana-durante-la-segunda-vuelta-presidencial-datos-de-preconteo-con-un-avance-del-999/`
+- `moe.org.co/datos-definitivos-del-escrutinio-elecciones-presidenciales-2022-segunda-vuelta-resultados-definitivos-declarados-por-el-consejo-nacional-electoral/`
+
+### Schema (verified for 1ra vuelta)
+
+Both 1ra-vuelta xlsx files share the same shape (~103,365 rows, 18 cols):
+
+```
+COD_DANE  Departamento  Municipio  Zona  Num_puesto  Puesto  Num_mesa
+Sergio Fajardo  Federico Gutiérrez  Gustavo Petro  John Milton Rodríguez
+Luis Pérez  Rodolfo Hernández  Enrique Gómez  Ingrid Betancourt
+VOTOS EN BLANCO  VOTOS NO MARCADOS  VOTOS NULOS
+```
+
+`COD_DANE` is the 5-digit DIVIPOLA municipal code. `Zona` + `Num_puesto`
++ `Num_mesa` uniquely identify a polling table within the municipality.
+The CNE-definitivo file has ~4 extra rows over the primer-avance file
+(late-counted mesas).
+
+### Recovering the 2nd-round files
+
+Both Google Sheets return `410 Gone` — they were deleted from the
+owner's Drive after publication. Recovery options, in increasing
+order of effort:
+
+1. **Wayback Machine** — Drive `/export?format=xlsx` URLs are sometimes
+   archived. Query
+   `https://web.archive.org/cdx/search/cdx?url=docs.google.com/spreadsheets/d/<ID>/*`
+   for each ID. Note: `web.archive.org` is AWS-hosted and blocks many
+   commercial-VPN exits with the same 919-byte CloudFront 403 the
+   Registraduría serves; probe from a residential link or a clean
+   exit.
+2. **archive.today** — separate from Wayback, sometimes captures what
+   Wayback misses. Query `https://archive.ph/https://docs.google.com/spreadsheets/d/<ID>/`.
+3. **Other MOE artifacts** — the "Libro MOE: Resultados Electorales
+   Congreso y Presidencia 2022"
+   (`moe.org.co/libro-moe-resultados-electorales-congreso-y-presidencia-2022/`)
+   may include the 2nd-round aggregates as PDF appendices. Not
+   mesa-level but a useful sanity check.
+4. **Email MOE directly** — `datoselectorales.org` invites data
+   requests; the team that built the original xlsx likely still has
+   the source files.
+5. **Derecho de petición** to the Registraduría — the same data was
+   given to MOE under a transparency obligation, so the RNEC is
+   legally bound to produce it on request.
+
+### Local download helper
+
+`./download_moe_2022.sh [out_dir]` (defaults to
+`data_2026/historical/2022_mesa_moe/`) re-pulls the live first-round
+files and prints the dead 2nd-round URLs for the record. Output is
+gitignored.
+
+## Other historical sources surveyed
+
+These came up in the same search pass; none is mesa-granular for 2022
+but they are useful for cross-checking municipality-level totals or
+for earlier elections.
+
+- **CEDAE — Registraduría's open-data portal** —
+  `cedae.registraduria.gov.co/datos-para-la-democracia/resultados-electorales/explora-datos`
+  (mirror: `cedae.datasketch.co/datos-democracia/resultados-electorales/explora-los-datos/`).
+  Advertises downloadable CSVs from 1958 to present for Presidencia,
+  Congreso, Asamblea, Gobernación, Parlamento Andino, Alcaldía,
+  Concejo. SPA front-end — granularity (mesa vs municipality) and the
+  underlying download endpoints not yet probed. Likely municipality.
+- **CEDE / Uniandes DataHub** — `doi:10.71590/R2KLKI` "Resultados
+  Electorales de Colombia", 258 files spanning 1958-present. Stated
+  granularity: *"desagregación municipal y por candidato"* — so
+  municipality-level only, not mesa.
+- **`estadisticaselectorales.registraduria.gov.co`** — interactive
+  Registraduría dashboard that still serves 2022 second-round numbers
+  through filterable tables with a download button. Live but not bulk-
+  scrapable; mesa granularity unknown.
+
+## What follows is the original dead-end inventory
+
+Kept verbatim so the next investigator does not re-run the dead-host
+search. The MOE path above supersedes it for the practical question
+of getting the numbers.
 
 ### What were the actual 2022 hostnames?
 
