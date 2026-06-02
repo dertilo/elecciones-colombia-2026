@@ -90,12 +90,28 @@ but they are useful for cross-checking municipality-level totals or
 for earlier elections.
 
 - **CEDAE — Registraduría's open-data portal** —
-  `cedae.registraduria.gov.co/datos-para-la-democracia/resultados-electorales/explora-datos`
+  `cedae.registraduria.gov.co/datos-para-la-democracia/resultados-electorales/descarga-datos`
   (mirror: `cedae.datasketch.co/datos-democracia/resultados-electorales/explora-los-datos/`).
-  Advertises downloadable CSVs from 1958 to present for Presidencia,
-  Congreso, Asamblea, Gobernación, Parlamento Andino, Alcaldía,
-  Concejo. SPA front-end — granularity (mesa vs municipality) and the
-  underlying download endpoints not yet probed. Likely municipality.
+  Probed 2026-06: the Next.js front-end embeds a Strapi CMS payload
+  listing **228 files spanning 1958–2019** for Presidencia, Senado,
+  Cámara, Asamblea, Concejo, Gobernación, Alcaldía. Each year ships in
+  both `.csv` and Stata `.dta` form, served as static blobs from
+  `cmscedae.registraduria.gov.co/uploads/<name>_<hash>.<ext>`. The
+  Strapi REST API (`/api/...`) is access-restricted (404) but the URLs
+  embedded in the page render are direct downloads, no auth needed.
+
+  **Granularity: municipality, not mesa.** Verified by downloading
+  `2018_presidencia_segunda_vuelta_dta_c27d4515ed.csv` (628 KB,
+  5,803 rows, 16 cols): schema is
+  `id_electoral, ano, tipo_eleccion, fecha_eleccion, coddpto,
+  departamento, codmpio, municipio, circunscripcion, codigo_partido,
+  codigo_lista, primer_apellido, segundo_apellido, nombres, votos,
+  curules` — one row per (municipio × candidate). Excellent for
+  long-run time-series and party/candidate cross-walks, useless for
+  the mesa-level fraud cross-check.
+
+  **2022 is not in the dataset** — coverage stops at 2019 local
+  elections; presidential 2022 was never uploaded.
 - **CEDE / Uniandes DataHub** — `doi:10.71590/R2KLKI` "Resultados
   Electorales de Colombia", 258 files spanning 1958-present. Stated
   granularity: *"desagregación municipal y por candidato"* — so
@@ -104,6 +120,13 @@ for earlier elections.
   Registraduría dashboard that still serves 2022 second-round numbers
   through filterable tables with a download button. Live but not bulk-
   scrapable; mesa granularity unknown.
+- **MOE 2018** —
+  `moe.org.co/analisis-y-resultados-electorales-de-las-elecciones-de-2018/`.
+  Unlike 2022 there is **no xlsx series**: the post links only PDFs
+  (`Escrutinios-y-Resultados-1ra-vuelta.pdf`, `Resultados-2da-vuelta.pdf`,
+  `Resultados-Congreso-2018.pdf`). Probed the analogous
+  `wp-content/uploads/2018/06/*.xlsx` naming pattern — all 404. So the
+  MOE shortcut that works for 2022 does not transfer to 2018.
 
 ## What follows is the original dead-end inventory
 
