@@ -291,9 +291,12 @@ expected `~870 × 2610 pts`.
 The 2-digit prefix in mesa codes / file paths is **not** the DIVIPOLA
 code. Registraduría uses a separate electoral coding (34 codes
 including `01`, `03`, `07`, `09`, `88`-consulado, … none of which exist
-in DIVIPOLA). One concrete confirmation from the eyeballed sample:
-`dep=05, mun=097` decodes to `BOLIVAR / SIMITÍ` in the acta header,
-whereas DIVIPOLA `05` is Antioquia.
+in DIVIPOLA). Confirmations from eyeballed samples:
+
+- `dep=01, mun=001` decodes to `ANTIOQUIA / MEDELLIN` (Registraduría
+  `01` = Antioquia, the largest department by mesa count).
+- `dep=05, mun=097` decodes to `BOLIVAR / SIMITÍ` (Registraduría
+  `05` ≠ DIVIPOLA `05` Antioquia).
 
 Within `dep=88` (Consulados), the second level is the consulate
 country/city rather than a Colombian municipality — e.g.
