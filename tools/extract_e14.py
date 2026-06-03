@@ -146,10 +146,12 @@ def _process_page(
         "cells_written": 0,
     }
 
-    # Schema lookup (page 4+ has no schema).  We only emit ``vote_digit``
-    # cells -- bands/rows/headers/signatures are useful for layout QA but
+    # Schema lookup (page 4+ has no schema).  We only emit ``vote_digits``
+    # strips -- bands/rows/headers/signatures are useful for layout QA but
     # not for downstream OCR, and writing them out balloons the corpus by
-    # ~2x without adding information.
+    # ~2x without adding information.  Each strip is one 3-digit number,
+    # so a text-line OCR (TrOCR etc.) sees a 3-character string with
+    # left-to-right context instead of three isolated digit crops.
     try:
         all_cells: list[Cell] = schema_cells(template, page_idx)
     except ValueError as e:
@@ -157,7 +159,7 @@ def _process_page(
         out_page_dir.mkdir(parents=True, exist_ok=True)
         (out_page_dir / "page.json").write_text(json.dumps(summary, indent=2))
         return summary
-    cell_list = [c for c in all_cells if c.kind == "vote_digit"]
+    cell_list = [c for c in all_cells if c.kind == "vote_digits"]
 
     # Warp scan -> reference. ``warp_one`` writes warped.png + diag.png +
     # warp.json to a directory we control; we keep them in a scratch

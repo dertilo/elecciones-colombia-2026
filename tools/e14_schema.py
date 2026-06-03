@@ -84,39 +84,42 @@ def _header_band(page_id: str, y0: int, y1: int) -> Cell:
                 (X_LEFT, y0, PAGE_W, y1 - y0))
 
 
-def _digits(row_id: str, y_center: int, row_height: int) -> list[Cell]:
-    """Three vote-digit cells for one numeric row (padded for warp slack)."""
+def _digits(row_id: str, y_center: int, row_height: int) -> Cell:
+    """Single merged 3-digit vote strip for one numeric row.
+
+    The three nominal 270-px digit cells sit at x = DIGIT_X0 + k*DIGIT_STRIDE
+    for k = 0..2.  Their union spans 2*DIGIT_STRIDE + DIGIT_WIDTH = 870 px;
+    with DIGIT_PAD_X on each side it becomes 900 px.  Single crop per row
+    so a text-line OCR sees a 3-character string with left-to-right context.
+    """
     nominal_h = int(row_height * DIGIT_HEIGHT_FRAC)
-    w = DIGIT_WIDTH + 2 * DIGIT_PAD_X
+    w = 2 * DIGIT_STRIDE + DIGIT_WIDTH + 2 * DIGIT_PAD_X   # 900
     h = nominal_h + 2 * DIGIT_PAD_Y
+    x = DIGIT_X0 - DIGIT_PAD_X
     y = y_center - h // 2
-    return [
-        Cell(f"{row_id}.digit_{i + 1}", "vote_digit",
-             (DIGIT_X0 + i * DIGIT_STRIDE - DIGIT_PAD_X, y, w, h))
-        for i in range(3)
-    ]
+    return Cell(f"{row_id}.digits", "vote_digits", (x, y, w, h))
 
 
 def _candidate_row(row_id: str, cand_no: int,
                    y0: int, row_h: int) -> list[Cell]:
-    """One candidate row (outline) + 3 digit sub-cells."""
+    """One candidate row (outline) + merged 3-digit strip."""
     y_center = y0 + row_h // 2
     row_cell = Cell(row_id, "candidate_row", (CAND_X, y0, CAND_W, row_h))
-    return [row_cell] + _digits(row_id, y_center, row_h)
+    return [row_cell, _digits(row_id, y_center, row_h)]
 
 
 def _niv_row(row_id: str, y0: int, row_h: int) -> list[Cell]:
-    """One nivelación row (outline) + 3 digit sub-cells."""
+    """One nivelación row (outline) + merged 3-digit strip."""
     y_center = y0 + row_h // 2
     row_cell = Cell(row_id, "nivelacion_row", (CAND_X, y0, CAND_W, row_h))
-    return [row_cell] + _digits(row_id, y_center, row_h)
+    return [row_cell, _digits(row_id, y_center, row_h)]
 
 
 def _summary_row(row_id: str, y0: int, row_h: int) -> list[Cell]:
-    """One summary/totals row (outline) + 3 digit sub-cells."""
+    """One summary/totals row (outline) + merged 3-digit strip."""
     y_center = y0 + row_h // 2
     row_cell = Cell(row_id, "summary_row", (CAND_X, y0, CAND_W, row_h))
-    return [row_cell] + _digits(row_id, y_center, row_h)
+    return [row_cell, _digits(row_id, y_center, row_h)]
 
 
 def _sig_rows(page_id: str,

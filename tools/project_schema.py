@@ -29,7 +29,7 @@ from e14_schema import cells, reference_image  # noqa: E402 (after sys.path)
 # ---------------------------------------------------------------------------
 
 PALETTE: dict[str, tuple[int, int, int]] = {
-    "vote_digit":      (0,   0,   220),   # red
+    "vote_digits":      (0,   0,   220),   # red
     "candidate_row":   (0,   200,  0),    # green
     "nivelacion_row":  (200, 200,  0),    # cyan-ish
     "summary_row":     (0,   165, 255),   # orange
@@ -44,7 +44,7 @@ PALETTE: dict[str, tuple[int, int, int]] = {
 
 # Thickness per kind (thicker outline for container rows, thin for digit cells)
 THICKNESS: dict[str, int] = {
-    "vote_digit":      2,
+    "vote_digits":      2,
     "candidate_row":   4,
     "nivelacion_row":  4,
     "summary_row":     4,
@@ -64,7 +64,7 @@ DRAW_ORDER = [
     "nivelacion_row", "candidate_row", "summary_row",
     "signature_block",
     "checkbox",
-    "vote_digit",
+    "vote_digits",
 ]
 
 
@@ -83,7 +83,7 @@ def draw_overlay(img: np.ndarray, cell_list) -> np.ndarray:
             x, y, w, h = c.bbox
             cv2.rectangle(overlay, (x, y), (x + w, y + h), colour, thickness)
             # Label: small text at top-left of cell (skip tiny digit cells)
-            if kind not in ("vote_digit",):
+            if kind not in ("vote_digits",):
                 label = c.id.split(".")[-1]   # last segment only
                 cv2.putText(
                     overlay, label,
@@ -93,14 +93,14 @@ def draw_overlay(img: np.ndarray, cell_list) -> np.ndarray:
                 )
 
     # Also label digits compactly
-    for c in by_kind.get("vote_digit", []):
+    for c in by_kind.get("vote_digits", []):
         x, y, w, h = c.bbox
         label = c.id.split(".")[-1]   # e.g. "digit_1"
         cv2.putText(
             overlay, label,
             (x + 2, y + 22),
             cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-            PALETTE["vote_digit"], 1, cv2.LINE_AA
+            PALETTE["vote_digits"], 1, cv2.LINE_AA
         )
 
     return overlay
